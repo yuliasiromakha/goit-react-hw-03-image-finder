@@ -14,7 +14,7 @@ class SearchBar extends React.Component {
   onSubmit = event => {
     event.preventDefault();
     if (this.state.searchInput.trim() === '') {
-      alert('Please put in a valid search')
+      alert('Please put in a valid')
       return
     }
     this.props.afterSubmit(this.state.searchInput);

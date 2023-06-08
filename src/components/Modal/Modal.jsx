@@ -1,14 +1,27 @@
-import * as basicLightbox from 'basiclightbox'
-
-const Modal = ((largeImageUrl, tags) => {
-
-    basicLightbox.create(`
-        <div className="overlay">
-            <div className="modal">
-                <img src=${largeImageUrl} alt="${tags}" />
-            </div>
+import React from "react";
+import './Modal.css';
+class Modal extends React.Component {
+  componentDidMount() {
+    window.addEventListener("keydown", this.handleKeyDown);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this.handleKeyDown);
+  }
+  handleKeyDown = (event) => {
+    if (event.key === "Escape") {
+      this.props.handleModalClose(); 
+    }
+  }
+  
+  render() {
+    const { largeImageURL } = this.props;
+    return (
+      <div className="overlay">
+        <div className="modal">
+          <img src={largeImageURL} alt='name' style={{ width: '830px', height: '600px' }} />
         </div>
-`)
-} )
-
-export default Modal;
+      </div>
+    );
+  }
+}
+export default Modal; 
