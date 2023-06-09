@@ -18,17 +18,9 @@ class SearchBar extends React.Component {
       return
     }
     this.props.afterSubmit(this.state.searchInput);
-    // const input = document.querySelector('.input');
-    // const inputValue = input.value.trim();
-    // console.log(inputValue);
   }
 
-  // resetPage() {
-  //   this.page = 1;
-  // }
-
   render() {
-    // const { onSubmit } = this.props;
 
     return (
       <header className="searchbar">
