@@ -36,7 +36,7 @@ class ImageGallery extends React.Component {
             ))}
           </ul>
         )}
-        
+
         {showModal && <Modal largeImageURL={modalImageURL} handleModalClose={this.props.toggleModal} />}
       </>
     );
@@ -45,3 +45,4 @@ class ImageGallery extends React.Component {
 
 export default ImageGallery;
 // onClick={this.props.handleModalClose}
+
