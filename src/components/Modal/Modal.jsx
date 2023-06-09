@@ -12,16 +12,19 @@ class Modal extends React.Component {
       this.props.handleModalClose(); 
     }
   }
-  
-  render() {
+
+render() {
     const { largeImageURL } = this.props;
     return (
-      <div className="overlay">
+      <div className="overlay" onClick={this.props.handleModalClose}>
         <div className="modal">
-          <img src={largeImageURL} alt='name' style={{ width: '830px', height: '600px' }} />
+            <img src={largeImageURL} alt="name" style={{ width: '830px', height: '600px' }} />
         </div>
       </div>
     );
   }
+  
 }
+// this.props.handleModalClose
 export default Modal; 
+
