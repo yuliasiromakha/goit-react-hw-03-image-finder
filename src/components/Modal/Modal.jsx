@@ -27,4 +27,3 @@ render() {
 }
 // this.props.handleModalClose
 export default Modal; 
-

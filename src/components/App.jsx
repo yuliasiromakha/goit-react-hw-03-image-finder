@@ -1,7 +1,7 @@
 import React from 'react';
 import SearchBar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
-// import Modal from './Modal/Modal';
+import { fetchImages } from 'API';
 import './general.css';
 
 export class App extends React.Component {
@@ -12,26 +12,32 @@ export class App extends React.Component {
     modalImageURL: '',
     status: 'idle',
     error: null,
+    page: 1,
   };
 
   handleFormSubmit = (searchValue) => {
-    this.setState({ searchValue, status: 'pending' });
+    this.setState({ searchValue, status: 'pending', page: 1 });
+    this.fetchImagesData(searchValue, 1);
+  };
 
-    const BASE_URL = 'https://pixabay.com/api/';
-    const API_KEY = '35566788-2396923f3520db2f530781152';
+  handleLoadMore = () => {
+    const { searchValue, page } = this.state;
+    const nextPage = page + 1;
 
-    fetch(
-      `${BASE_URL}?q=${searchValue}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-    )
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
+    this.setState({ page: nextPage });
+    this.fetchImagesData(searchValue, nextPage);
+  };
 
-        throw new Error("We're sorry, there are no pictures for your search");
-      })
+  fetchImagesData = (searchValue, page) => {
+    fetchImages(searchValue, page)
       .then((data) => {
-        this.setState({ search: data, status: 'resolved' });
+        this.setState((prevState) => ({
+          search: {
+            ...prevState.search,
+            hits: [...(prevState.search?.hits || []), ...data.hits],
+          },
+          status: 'resolved',
+        }));
       })
       .catch((error) => {
         console.error(error);
@@ -56,8 +62,8 @@ export class App extends React.Component {
           toggleModal={this.toggleModal}
           status={status}
           error={error}
+          onLoadMore={this.handleLoadMore}
         />
-        {/* {showModal && <Modal imageURL={modalImageURL} />} */}
       </div>
     );
   }
