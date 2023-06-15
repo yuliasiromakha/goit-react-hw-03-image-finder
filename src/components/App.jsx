@@ -1,6 +1,7 @@
 import React from 'react';
 import SearchBar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
+import Loader from './Loader/Loader';
 import { fetchImages } from 'API';
 import './general.css';
 
@@ -13,19 +14,28 @@ export class App extends React.Component {
     status: 'idle',
     error: null,
     page: 1,
+    showBtn: false, 
   };
+
+  componentDidUpdate(prevProps, prevState) {
+    const prevQuery = prevState.searchValue;
+    const nextQuery = this.state.searchValue;
+    const prevPage = prevState.page;
+    const nextPage = this.state.page;
+
+    if (prevQuery !== nextQuery || prevPage !== nextPage) {
+      this.fetchImagesData(nextQuery, nextPage);
+    }
+  }
 
   handleFormSubmit = (searchValue) => {
     this.setState({ searchValue, status: 'pending', page: 1 });
-    this.fetchImagesData(searchValue, 1);
   };
 
   handleLoadMore = () => {
-    const { searchValue, page } = this.state;
-    const nextPage = page + 1;
-
-    this.setState({ page: nextPage });
-    this.fetchImagesData(searchValue, nextPage);
+    this.setState((prevState) => ({
+      page: prevState.page + 1,
+    }));
   };
 
   fetchImagesData = (searchValue, page) => {
@@ -34,9 +44,10 @@ export class App extends React.Component {
         this.setState((prevState) => ({
           search: {
             ...prevState.search,
-            hits: [...(prevState.search?.hits || []), ...data.hits],
+            hits: [...(prevState.search && prevState.search.hits || []), ...data.hits],
           },
           status: 'resolved',
+          showBtn: data.hits.length >= 12 && this.state.page < Math.ceil(data.totalHits / 12),
         }));
       })
       .catch((error) => {
@@ -44,6 +55,7 @@ export class App extends React.Component {
         this.setState({ error, status: 'rejected' });
       });
   };
+  
 
   toggleModal = (modalImageURL) => {
     this.setState({ showModal: !this.state.showModal, modalImageURL });
@@ -51,19 +63,29 @@ export class App extends React.Component {
 
   render() {
     const { search, showModal, modalImageURL, status, error } = this.state;
+    // const noPicturesFound = search && search.hits && search.hits.length === 0;
 
     return (
       <div className="general__css">
         <SearchBar afterSubmit={this.handleFormSubmit} />
-        <ImageGallery
-          search={search}
-          showModal={showModal}
-          modalImageURL={modalImageURL}
-          toggleModal={this.toggleModal}
-          status={status}
-          error={error}
-          onLoadMore={this.handleLoadMore}
-        />
+        {this.state.status === 'pending' && <Loader/>}
+        {this.state.status === 'rejected' && <p>{this.state.error.message}</p>}
+        {/* {status === 'rejected' && noPicturesFound && <p>No pictures found</p>} */}
+        {/* {search.length > 0 &&  */}
+        {this.state.status === 'resolved' && this.state.showBtn && (
+            <ImageGallery
+            search={search}
+            showModal={showModal}
+            modalImageURL={modalImageURL}
+            toggleModal={this.toggleModal}
+            status={status}
+            error={error}
+            onLoadMore={this.handleLoadMore}
+          />
+  )
+}
+
+
       </div>
     );
   }
