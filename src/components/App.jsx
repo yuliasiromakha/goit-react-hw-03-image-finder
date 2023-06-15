@@ -44,7 +44,7 @@ export class App extends React.Component {
         this.setState((prevState) => ({
           search: {
             ...prevState.search,
-            hits: [...(prevState.search && prevState.search.hits || []), ...data.hits],
+            hits: [...((prevState.search && prevState.search.hits) || []), ...data.hits],
           },
           status: 'resolved',
           showBtn: data.hits.length >= 12 && this.state.page < Math.ceil(data.totalHits / 12),
