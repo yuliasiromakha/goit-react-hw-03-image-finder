@@ -80,7 +80,7 @@ export class App extends React.Component {
             toggleModal={this.toggleModal}
           />)}
           
-          {imagesLoaded && images.length > 0 && <Button onClick={this.handleLoadMore} />}
+          {imagesLoaded && <Button onClick={this.handleLoadMore} />}
           
       </div>
     );
