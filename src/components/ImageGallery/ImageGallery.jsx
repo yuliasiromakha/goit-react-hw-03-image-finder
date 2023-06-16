@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
-import Button from 'components/Button/Button';
 import Modal from 'components/Modal/Modal';
 import './ImageGallery.css';
 
 
 class ImageGallery extends Component {
     render() {
-      const { search, showModal, modalImageURL, onLoadMore, toggleModal } = this.props;
-      const imagesLoaded = search && search.hits && search.hits.length > 0;
+      const { search, showModal, modalImageURL, toggleModal } = this.props;
+      // const imagesLoaded = search && search.hits && search.hits.length > 0;
   
       return (
         <div>
@@ -28,7 +27,7 @@ class ImageGallery extends Component {
                   ))}
               </ul>
   
-              {imagesLoaded && <Button onClick={onLoadMore} />}
+              {/* {imagesLoaded && <Button onClick={onLoadMore} />} */}
             </>
           {/* )} */}
   

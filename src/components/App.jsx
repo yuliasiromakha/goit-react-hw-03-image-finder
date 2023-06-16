@@ -2,6 +2,7 @@ import React from 'react';
 import SearchBar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Loader from './Loader/Loader';
+import Button from './Button/Button';
 import { fetchImages } from 'API';
 import './general.css';
 
@@ -47,7 +48,7 @@ export class App extends React.Component {
             hits: [...((prevState.search && prevState.search.hits) || []), ...data.hits],
           },
           status: 'resolved',
-          showBtn: data.hits.length >= 12 && this.state.page < Math.ceil(data.totalHits / 12),
+          showBtn: this.state.page < Math.ceil(data.totalHits / 12),
         }));
       })
       .catch((error) => {
@@ -62,30 +63,28 @@ export class App extends React.Component {
   };
 
   render() {
-    const { search, showModal, modalImageURL, status, error } = this.state;
+    const { search, showModal, modalImageURL } = this.state;
     // const noPicturesFound = search && search.hits && search.hits.length === 0;
+    const imagesLoaded = search && search.hits && search.hits.length > 0;
 
     return (
       <div className="general__css">
         <SearchBar afterSubmit={this.handleFormSubmit} />
+
         {this.state.status === 'pending' && <Loader/>}
+
         {this.state.status === 'rejected' && <p>{this.state.error.message}</p>}
-        {/* {status === 'rejected' && noPicturesFound && <p>No pictures found</p>} */}
-        {/* {search.length > 0 &&  */}
+
         {this.state.status === 'resolved' && this.state.showBtn && (
             <ImageGallery
             search={search}
             showModal={showModal}
             modalImageURL={modalImageURL}
             toggleModal={this.toggleModal}
-            status={status}
-            error={error}
-            onLoadMore={this.handleLoadMore}
-          />
-  )
-}
+          />)}
 
-
+          {imagesLoaded && <Button onClick={this.handleLoadMore} />}
+          
       </div>
     );
   }
