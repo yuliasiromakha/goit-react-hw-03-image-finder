@@ -9,7 +9,7 @@ import './general.css';
 export class App extends React.Component {
   state = {
     searchValue: '',
-    search: null,
+    images: [],
     showModal: false,
     modalImageURL: '',
     status: 'idle',
@@ -30,8 +30,9 @@ export class App extends React.Component {
   }
 
   handleFormSubmit = (searchValue) => {
-    this.setState({ searchValue, status: 'pending', page: 1 });
+    this.setState({ searchValue, status: 'pending', page: 1, images: [] }); 
   };
+  
 
   handleLoadMore = () => {
     this.setState((prevState) => ({
@@ -43,13 +44,10 @@ export class App extends React.Component {
     fetchImages(searchValue, page)
       .then((data) => {
         this.setState((prevState) => ({
-          search: {
-            ...prevState.search,
-            hits: [...((prevState.search && prevState.search.hits) || []), ...data.hits],
-          },
+          images:[...prevState.images,...data.hits],
           status: 'resolved',
           showBtn: this.state.page < Math.ceil(data.totalHits / 12),
-        }));
+        }))
       })
       .catch((error) => {
         console.error(error);
@@ -63,9 +61,8 @@ export class App extends React.Component {
   };
 
   render() {
-    const { search, showModal, modalImageURL } = this.state;
-    // const noPicturesFound = search && search.hits && search.hits.length === 0;
-    const imagesLoaded = search && search.hits && search.hits.length > 0;
+    const { images, showModal, modalImageURL } = this.state;
+    const imagesLoaded = images.length > 0;
 
     return (
       <div className="general__css">
@@ -77,13 +74,13 @@ export class App extends React.Component {
 
         {this.state.status === 'resolved' && this.state.showBtn && (
             <ImageGallery
-            search={search}
+            images={images}
             showModal={showModal}
             modalImageURL={modalImageURL}
             toggleModal={this.toggleModal}
           />)}
-
-          {imagesLoaded && <Button onClick={this.handleLoadMore} />}
+          
+          {imagesLoaded && images.length > 0 && <Button onClick={this.handleLoadMore} />}
           
       </div>
     );
