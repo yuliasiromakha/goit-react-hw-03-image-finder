@@ -13,10 +13,15 @@ class Modal extends React.Component {
     }
   }
 
+  handleBackdropClick = (event) => {
+    if (event.target === event.currentTarget) {
+      this.props.handleModalClose(); 
+    }
+  }
 render() {
     const { largeImageURL } = this.props;
     return (
-      <div className="overlay" onClick={this.props.handleModalClose}>
+      <div className="overlay" onClick={this.handleBackdropClick}>
         <div className="modal">
             <img src={largeImageURL} alt="name" style={{ width: '830px', height: '600px' }} />
         </div>
@@ -25,5 +30,5 @@ render() {
   }
   
 }
-// this.props.handleModalClose
+
 export default Modal; 

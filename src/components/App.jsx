@@ -66,8 +66,8 @@ export class App extends React.Component {
   };
 
   render() {
-    const { images, showModal, modalImageURL } = this.state;
-    const imagesLoaded = images.length > 0;
+    const { images, showModal, modalImageURL, showBtn } = this.state;
+    // const imagesLoaded = images.length > 0;
 
     return (
       <div className="general__css">
@@ -77,7 +77,7 @@ export class App extends React.Component {
 
         {this.state.status === 'rejected' && <p>{this.state.error.message}</p>}
 
-        {this.state.status === 'resolved' && this.state.showBtn && (
+        {images.length > 0 && (
             <ImageGallery
             images={images}
             showModal={showModal}
@@ -85,7 +85,7 @@ export class App extends React.Component {
             toggleModal={this.toggleModal}
           />)}
           
-          {imagesLoaded && <Button onClick={this.handleLoadMore} />}
+          {showBtn && <Button onClick={this.handleLoadMore} />}
           
       </div>
     );
