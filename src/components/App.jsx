@@ -43,22 +43,27 @@ export class App extends React.Component {
   fetchImagesData = (searchValue, page) => {
     fetchImages(searchValue, page)
       .then((data) => {
-        if(!data.totalHits){
-          alert("No pictures were found")
-          return
-          }
-
+        if (!data.totalHits) {
+          alert("No pictures were found");
+          this.setState({
+            status: 'resolved',
+            showBtn: false,
+          });
+          return;
+        }
+  
         this.setState((prevState) => ({
-          images:[...prevState.images,...data.hits],
+          images: [...prevState.images, ...data.hits],
           status: 'resolved',
           showBtn: this.state.page < Math.ceil(data.totalHits / 12),
-        }))
+        }));
       })
       .catch((error) => {
         console.error(error);
         this.setState({ error, status: 'rejected' });
       });
   };
+  
   
 
   toggleModal = (modalImageURL) => {
