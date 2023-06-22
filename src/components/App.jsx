@@ -1,100 +1,84 @@
-import React from 'react';
 import SearchBar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Loader from './Loader/Loader';
 import Button from './Button/Button';
 import { fetchImages } from 'API';
 import './general.css';
+import { useState, useEffect } from 'react';
 
-export class App extends React.Component {
-  state = {
-    searchValue: '',
-    images: [],
-    showModal: false,
-    modalImageURL: '',
-    status: 'idle',
-    error: null,
-    page: 1,
-    showBtn: false, 
-  };
+const App = () => {
+  const [searchValue, setSearchValue] = useState('');
+  const [images, setImages] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [modalImageURL, setModalImageURL] = useState('');
+  const [status, setStatus] = useState('idle');
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [showBtn, setShowBtn] = useState(false);
 
-  componentDidUpdate(prevProps, prevState) {
-    const prevQuery = prevState.searchValue;
-    const nextQuery = this.state.searchValue;
-    const prevPage = prevState.page;
-    const nextPage = this.state.page;
-
-    if (prevQuery !== nextQuery || prevPage !== nextPage) {
-      this.fetchImagesData(nextQuery, nextPage);
-    }
-  }
-
-  handleFormSubmit = (searchValue) => {
-    this.setState({ searchValue, status: 'pending', page: 1, images: [] }); 
-  };
-  
-
-  handleLoadMore = () => {
-    this.setState((prevState) => ({
-      page: prevState.page + 1,
-    }));
-  };
-
-  fetchImagesData = (searchValue, page) => {
-    fetchImages(searchValue, page)
-      .then((data) => {
+  useEffect(() => {
+    const fetchImagesData = async (searchValue, page) => {
+      try {
+        const data = await fetchImages(searchValue, page);
         if (!data.totalHits) {
-          alert("No pictures were found");
-          this.setState({
-            status: 'resolved',
-            showBtn: false,
-          });
+          alert('No pictures were found');
+          setStatus('resolved');
+          setShowBtn(false);
           return;
         }
-  
-        this.setState((prevState) => ({
-          images: [...prevState.images, ...data.hits],
-          status: 'resolved',
-          showBtn: this.state.page < Math.ceil(data.totalHits / 12),
-        }));
-      })
-      .catch((error) => {
+
+        setImages((prevImages) => [...prevImages, ...data.hits]);
+        setStatus('resolved');
+        setShowBtn(page < Math.ceil(data.totalHits / 12));
+      } catch (error) {
         console.error(error);
-        this.setState({ error, status: 'rejected' });
-      });
+        setError(error);
+        setStatus('rejected');
+      }
+    };
+    
+    if (searchValue !== '' || page !== 1) {
+      fetchImagesData(searchValue, page);
+    }
+  }, [searchValue, page]);
+
+  const handleFormSubmit = (searchValue) => {
+    setSearchValue(searchValue)
+    setStatus('pending');
+    setPage(1);
+    setImages([]);
+  };
+
+  const handleLoadMore = () => {
+    setPage((prevPage) => prevPage + 1 );
   };
   
-  
-
-  toggleModal = (modalImageURL) => {
-    this.setState({ showModal: !this.state.showModal, modalImageURL });
+  const toggleModal = (modalImageURL) => {
+    setShowModal((prevShowModal) => !prevShowModal)
+    setModalImageURL(modalImageURL)
   };
 
-  render() {
-    const { images, showModal, modalImageURL, showBtn } = this.state;
-    // const imagesLoaded = images.length > 0;
+  return (
+    <div className="general__css">
+      <SearchBar afterSubmit={handleFormSubmit} />
 
-    return (
-      <div className="general__css">
-        <SearchBar afterSubmit={this.handleFormSubmit} />
+      {status === 'pending' && <Loader/>}
 
-        {this.state.status === 'pending' && <Loader/>}
+      {status === 'rejected' && <p>{error.message}</p>}
 
-        {this.state.status === 'rejected' && <p>{this.state.error.message}</p>}
+      {images.length > 0 && (
+          <ImageGallery
+          images={images}
+          showModal={showModal}
+          modalImageURL={modalImageURL}
+          toggleModal={toggleModal}
+        />)}
+        
+        {showBtn && <Button onClick={handleLoadMore} />}
+        
+    </div>
+  );
 
-        {images.length > 0 && (
-            <ImageGallery
-            images={images}
-            showModal={showModal}
-            modalImageURL={modalImageURL}
-            toggleModal={this.toggleModal}
-          />)}
-          
-          {showBtn && <Button onClick={this.handleLoadMore} />}
-          
-      </div>
-    );
-  }
 }
 
 export default App;

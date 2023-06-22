@@ -1,34 +1,36 @@
 import React from "react";
-import './Modal.css';
-class Modal extends React.Component {
-  componentDidMount() {
-    window.addEventListener("keydown", this.handleKeyDown);
-  }
-  componentWillUnmount() {
-    window.removeEventListener("keydown", this.handleKeyDown);
-  }
-  handleKeyDown = (event) => {
-    if (event.key === "Escape") {
-      this.props.handleModalClose(); 
+import { useEffect } from "react";
+import './Modal.css'
+
+const Modal = ({largeImageURL, handleModalClose}) => {
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        handleModalClose(); 
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+
+  }, [handleModalClose])
+
+  const handleBackdropClick = (event) => {
+    if (event.target === event.currentTarget) {
+      handleModalClose(); 
     }
   }
 
-  handleBackdropClick = (event) => {
-    if (event.target === event.currentTarget) {
-      this.props.handleModalClose(); 
-    }
-  }
-render() {
-    const { largeImageURL } = this.props;
-    return (
-      <div className="overlay" onClick={this.handleBackdropClick}>
-        <div className="modal">
-            <img src={largeImageURL} alt="name" style={{ width: '830px', height: '600px' }} />
-        </div>
+  return (
+    <div className="overlay" onClick={handleBackdropClick}>
+      <div className="modal">
+          <img src={largeImageURL} alt="name" style={{ width: '830px', height: '600px' }} />
       </div>
-    );
-  }
-  
+    </div>
+  );
 }
 
-export default Modal; 
+export default Modal;
